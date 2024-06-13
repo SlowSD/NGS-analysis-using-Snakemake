@@ -1,24 +1,8 @@
 # Defining files
-
 work_dir = "/mnt/c/Users/sunil/Downloads/NGS_example_dataset/paeruginosa-reads/shell/script/"
 R1 = "/mnt/c/Users/sunil/Downloads/NGS_example_dataset/paeruginosa-reads/shell/script/SRR396636.sra_1.fastq"
 R2 = "/mnt/c/Users/sunil/Downloads/NGS_example_dataset/paeruginosa-reads/shell/script/SRR396636.sra_2.fastq"
 Analysis_summary = "/mnt/c/Users/sunil/Downloads/NGS_example_dataset/paeruginosa-reads/shell/script/Analysis_summary.txt"
-
-# Learning about basename
-'''
-basename can be used to hide complete path
-'''
-rule basename:
-    shell: """
-    echo "$(basename ${Analysis_summary})"
-"""
-
-# Learning about dirname
-rule dirname:
-    shell: """
-    echo "$(dirname ${Analysis_summary})"
-"""
 
 # 0. Determining the number of reads in fastq file
 rule fastq_reads_count:
@@ -40,24 +24,6 @@ rule fastqc:
     fastqc {input} -o {work_dir}fastqc_results
     echo "Fastqc is completed!"
 """
-
-# 1.1
-rule fastqc2:
-    input:
-        "{fastqc}_1.fastq"
-        "{fastqc}_2.fastq"
-    output:
-        "{fastqc}_1.fastqc.html"
-        "{fastqc}_2.fastqc.html"
-    
-    shell: '''
-    mkdir fastqc_reports
-    fastqc {input} -o fastqc_reports/ {output}
-'''
-
-    
-
-
 
 # 2. Running trim_galore
 rule trim_galore:
@@ -85,7 +51,6 @@ rule fastq_reads_count2:
 """
 
 # 3. Alignment
-
 # 3.1 Generating index for the reference genome
 rule reference_genome_index:
     input:
@@ -94,26 +59,3 @@ rule reference_genome_index:
     shell: """
     bwa index -p {input}
 """
-
-# ## 3.2 Alignment of reads to the reference genome
-# rule alignment:
-# input:
-#     "dir/fastq_files/{sample}.fastq",
-#     "dir/reference_genome/{sample}.fna"
-# output:
-#     "dir/alignment/{sample}.sam"
-# shell:
-#     """
-#     bwa mem {input} | samtools view -Sb - > {output}
-#     """
-
-# ## 3.3 Generating alignment index file
-# rule bam.bai
-# input:
-#     "dir/alignement_files/{sample}.bam"
-# output:
-#     "dir/alignment_files/{sample}.bam.bai"
-# shell:
-#     '''
-#     samtools index {input}
-#     '''
